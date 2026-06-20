@@ -1,0 +1,4 @@
+supabase==2.4.3
+pandas
+plotly
+st-theme
