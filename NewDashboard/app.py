@@ -5,12 +5,12 @@ from supabase import create_client, Client
 
 # 1. Page Layout Styling Configurations
 st.set_page_config(
-    page_title="Live MT5 Cloud Analytics",
+    page_title="Live MT5 Lembo Analytics Dashboard",
     page_icon="📈",
     layout="wide"
 )
 
-st.title("📊 Live MT5 Cloud Trading Dashboard")
+st.title("📊 Live MT5 Lembo Trading Dashboard")
 st.caption("Real-time performance directly synchronized from your Supabase Data Cloud Pipeline")
 
 # 2. Establish Database Secure Connections
