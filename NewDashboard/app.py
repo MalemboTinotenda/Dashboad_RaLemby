@@ -22,7 +22,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 @st.cache_data(ttl=30)  # Check cloud database for updates every 30 seconds
 def load_cloud_data():
     try:
-        response = supabase.table("trades").select("*").order("trade_time", descending=True).execute()
+        response = supabase.table("trades").select("*").order("trade_time", desc=True).execute()
         if response.data:
             return pd.DataFrame(response.data)
         return pd.DataFrame()
