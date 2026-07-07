@@ -46,11 +46,78 @@ if df_raw.empty:
 # 3. Filter Engine
 # Discount wins < $1.00, keep all losses
 # ─────────────────────────────────────────────
-df = df_raw[~((df_raw['profit'] >= 0) & (df_raw['profit'] < 1.00))].copy()
-df['trade_time'] = pd.to_datetime(df['trade_time'])
-df['trade_date'] = df['trade_time'].dt.date
-df['trade_hour'] = df['trade_time'].dt.hour
-df['Direction'] = df['symbol'].apply(lambda s: 'Short' if 'Boom' in str(s) else 'Long')
+df_all = df_raw[~((df_raw['profit'] >= 0) & (df_raw['profit'] < 1.00))].copy()
+df_all['trade_time'] = pd.to_datetime(df_all['trade_time'])
+df_all['trade_date'] = df_all['trade_time'].dt.date
+df_all['trade_hour'] = df_all['trade_time'].dt.hour
+df_all['Direction']  = df_all['symbol'].apply(lambda s: 'Short' if 'Boom' in str(s) else 'Long')
+
+# ─────────────────────────────────────────────
+# 3b. Date Range Slider
+# ─────────────────────────────────────────────
+min_date = df_all['trade_date'].min()
+max_date = df_all['trade_date'].max()
+all_dates = sorted(df_all['trade_date'].unique())
+
+st.sidebar.markdown("## 📅 Date Range Filter")
+
+if len(all_dates) > 1:
+    start_idx, end_idx = st.sidebar.select_slider(
+        "Select trading period",
+        options=list(range(len(all_dates))),
+        value=(0, len(all_dates) - 1),
+        format_func=lambda i: str(all_dates[i])
+    )
+    selected_start = all_dates[start_idx]
+    selected_end   = all_dates[end_idx]
+else:
+    selected_start = min_date
+    selected_end   = max_date
+
+st.sidebar.caption(f"Showing **{selected_start}** → **{selected_end}**")
+
+# Quick preset buttons
+st.sidebar.markdown("**Quick Presets**")
+preset_cols = st.sidebar.columns(2)
+if preset_cols[0].button("Last 7 days"):
+    selected_start = max_date - pd.Timedelta(days=6)
+    selected_end   = max_date
+if preset_cols[1].button("All time"):
+    selected_start = min_date
+    selected_end   = max_date
+
+# Instrument filter
+st.sidebar.markdown("## 🎯 Instrument Filter")
+all_symbols = sorted(df_all['symbol'].unique().tolist())
+selected_symbols = st.sidebar.multiselect(
+    "Select instruments",
+    options=all_symbols,
+    default=all_symbols
+)
+
+# Direction filter
+st.sidebar.markdown("## ↕️ Direction Filter")
+selected_directions = st.sidebar.multiselect(
+    "Select directions",
+    options=['Long', 'Short'],
+    default=['Long', 'Short']
+)
+
+# Apply all filters
+df = df_all[
+    (df_all['trade_date'] >= selected_start) &
+    (df_all['trade_date'] <= selected_end) &
+    (df_all['symbol'].isin(selected_symbols)) &
+    (df_all['Direction'].isin(selected_directions))
+].copy()
+
+if df.empty:
+    st.warning("⚠️ No trades match the current filters. Adjust the date range or instrument selection.")
+    st.stop()
+
+trade_count_all = len(df_all)
+trade_count_filtered = len(df)
+st.caption(f"Showing **{trade_count_filtered}** of **{trade_count_all}** total trades · {selected_start} → {selected_end}")
 
 # ─────────────────────────────────────────────
 # 4. Core Calculations
