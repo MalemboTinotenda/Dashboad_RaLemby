@@ -10,13 +10,13 @@ import numpy as np
 # 1. Page Config
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="Live MT5 Lembo Analytics Dashboard",
+    page_title="Live MT5 Lembo Analytics Dashboar",
     page_icon="📈",
     layout="wide"
 )
 
-st.title("📊 Live MT5 Lembo Trading Dashboard")
-st.caption("Real-time performance directly synchronized from your Supabase Data Cloud Pipeline")
+st.title("📊 Trading Dashboard raLemby")
+st.caption("Real-time performance tracking")
 
 # ─────────────────────────────────────────────
 # 2. Database Connection
